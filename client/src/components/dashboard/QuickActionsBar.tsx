@@ -21,7 +21,7 @@ function QuickActionsBar({
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
       {actions.map((action) => {
         const Icon = action.icon
         return (

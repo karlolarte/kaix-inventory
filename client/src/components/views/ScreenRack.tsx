@@ -8,6 +8,7 @@ import { screenStatusLabels, screenStatusStyles } from '../../lib/screenStatus'
 import type { PhysicalScreen } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
 import Collapse from '../ui/Collapse'
+import SkeletonRow from '../ui/SkeletonRow'
 import Toast from '../ui/Toast'
 import ScreenFormModal from './ScreenFormModal'
 
@@ -75,6 +76,20 @@ function ScreenColorwayList({ screen, screenOrdinals }: ScreenColorwayListProps)
         )
       })}
     </>
+  )
+}
+
+function ScreenRackSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <SkeletonRow
+          key={index}
+          avatarClassName="size-14"
+          trailing={['w-12', 'w-12', 'w-12', 'w-16']}
+        />
+      ))}
+    </div>
   )
 }
 
@@ -245,7 +260,12 @@ function ScreenRack({ searchQuery }: ScreenRackProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading screens..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading screens..."
+          skeleton={<ScreenRackSkeleton />}
+        />
       )}
 
       {!loading && !error && colorwayShortfalls.length > 0 && (

@@ -5,11 +5,32 @@ import { api } from '../../lib/api'
 import { categoryColor } from '../../lib/categoryColor'
 import { invalidInputClass } from '../../lib/formValidation'
 import AsyncState from '../ui/AsyncState'
+import Skeleton from '../ui/Skeleton'
 import Toast from '../ui/Toast'
 
 const inputClass =
   'mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100'
 const inputClassInvalid = `mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 outline-none dark:bg-slate-950 dark:text-slate-100 ${invalidInputClass}`
+
+function CategoryManagerSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60"
+        >
+          <Skeleton className="size-3 shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-3 w-36" />
+          </div>
+          <Skeleton className="h-6 w-8 shrink-0 rounded-full" />
+        </div>
+      ))}
+    </div>
+  )
+}
 
 function CategoryManager() {
   const { data: categories, loading, error, refetch } = useCategories()
@@ -137,7 +158,12 @@ function CategoryManager() {
       )}
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading categories..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading categories..."
+          skeleton={<CategoryManagerSkeleton />}
+        />
       )}
 
       {!loading && !error && (

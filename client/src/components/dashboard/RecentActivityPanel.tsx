@@ -2,6 +2,7 @@ import { History } from 'lucide-react'
 import { useRecentActivity } from '../../hooks/useActivityLog'
 import { activityActionLabels, activityActionStyles } from '../../lib/activityAction'
 import { relativeTime } from '../../lib/relativeTime'
+import Skeleton from '../ui/Skeleton'
 
 interface RecentActivityPanelProps {
   onViewAll: () => void
@@ -29,9 +30,14 @@ function RecentActivityPanel({ onViewAll }: RecentActivityPanelProps) {
       </div>
 
       <div className="mt-3 divide-y divide-slate-200 dark:divide-slate-800/80">
-        {loading && (
-          <p className="py-6 text-center text-sm text-slate-500">Loading activity...</p>
-        )}
+        {loading &&
+          Array.from({ length: VISIBLE_COUNT }).map((_, index) => (
+            <div key={index} className="flex items-center gap-3 py-2.5">
+              <Skeleton className="h-4 w-14 shrink-0 rounded-full" />
+              <Skeleton className="h-3 flex-1" />
+              <Skeleton className="h-3 w-10 shrink-0" />
+            </div>
+          ))}
         {!loading && error && (
           <p className="py-6 text-center text-sm text-red-600 dark:text-red-400">{error}</p>
         )}

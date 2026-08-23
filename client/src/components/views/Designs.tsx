@@ -20,6 +20,7 @@ import { formatScreenNumber } from '../../lib/screenNumber'
 import { screenStatusLabels, screenStatusStyles } from '../../lib/screenStatus'
 import type { ShirtDesign } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
+import SkeletonRow from '../ui/SkeletonRow'
 import Toast from '../ui/Toast'
 import BulkAddDesignsModal from './BulkAddDesignsModal'
 import DesignFormModal from './DesignFormModal'
@@ -101,6 +102,16 @@ function DesignDtfSummary({ design }: { design: ShirtDesign }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function DesignsSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <SkeletonRow key={index} trailing={['w-16', 'w-16', 'w-20']} />
+      ))}
     </div>
   )
 }
@@ -192,7 +203,12 @@ function Designs({ searchQuery }: DesignsProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading designs..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading designs..."
+          skeleton={<DesignsSkeleton />}
+        />
       )}
 
       {!loading && !error && (

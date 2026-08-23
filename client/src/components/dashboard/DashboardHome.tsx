@@ -10,6 +10,8 @@ import { api } from '../../lib/api'
 import type { DtfPrintOrder, RawMaterial } from '../../types/api'
 import type { ViewKey } from '../../lib/navigation'
 import AsyncState from '../ui/AsyncState'
+import Skeleton from '../ui/Skeleton'
+import SkeletonStatCard from '../ui/SkeletonStatCard'
 import Toast from '../ui/Toast'
 import StatCard from '../ui/StatCard'
 import DtfOrdersPanel from './DtfOrdersPanel'
@@ -21,6 +23,55 @@ import TopSellingDesigns from './TopSellingDesigns'
 
 interface DashboardHomeProps {
   onNavigate: (view: ViewKey) => void
+}
+
+// A panel box's shared shape (icon + title + "View all" up top, a handful
+// of rows below) — reused for every card in the dashboard's panel grid.
+function SkeletonPanel({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900/60">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-36" />
+        <Skeleton className="h-3 w-12" />
+      </div>
+      <div className="mt-4 space-y-3">
+        {Array.from({ length: rows }).map((_, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <Skeleton className="size-8 shrink-0 rounded-md" />
+            <Skeleton className="h-3 flex-1" />
+            <Skeleton className="h-3 w-14 shrink-0" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function DashboardHomeSkeleton() {
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <SkeletonStatCard key={index} />
+        ))}
+      </div>
+
+      <div>
+        <Skeleton className="mb-3 h-3 w-24" />
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-10 rounded-lg" />
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <SkeletonPanel key={index} />
+        ))}
+      </div>
+    </>
+  )
 }
 
 function DashboardHome({ onNavigate }: DashboardHomeProps) {
@@ -112,7 +163,12 @@ function DashboardHome({ onNavigate }: DashboardHomeProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading shop floor data..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading shop floor data..."
+          skeleton={<DashboardHomeSkeleton />}
+        />
       )}
 
       {!loading && !error && (

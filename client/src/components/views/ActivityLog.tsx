@@ -2,6 +2,7 @@ import { History, Loader2, TriangleAlert } from 'lucide-react'
 import { useActivityLogFeed } from '../../hooks/useActivityLog'
 import { activityActionLabels, activityActionStyles } from '../../lib/activityAction'
 import { relativeTime } from '../../lib/relativeTime'
+import Skeleton from '../ui/Skeleton'
 
 interface ActivityLogProps {
   searchQuery: string
@@ -40,10 +41,15 @@ function ActivityLog({ searchQuery }: ActivityLogProps) {
       </div>
 
       {isPending && (
-        <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500">
-          <Loader2 className="size-4 animate-spin" />
-          Loading activity...
-        </div>
+        <ul className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/60">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <li key={index} className="flex items-start gap-3 px-4 py-3">
+              <Skeleton className="h-5 w-16 shrink-0 rounded-full" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-3 w-12 shrink-0" />
+            </li>
+          ))}
+        </ul>
       )}
 
       {isError && (

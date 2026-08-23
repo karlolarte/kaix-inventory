@@ -10,6 +10,7 @@ import type { PrintRun, PrintRunItem } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
 import Collapse from '../ui/Collapse'
 import ConfirmDialog from '../ui/ConfirmDialog'
+import Skeleton from '../ui/Skeleton'
 import Toast from '../ui/Toast'
 import PrintRunFormModal from './PrintRunFormModal'
 
@@ -19,6 +20,38 @@ interface PrintRunsProps {
 
 const actionButtonClass =
   'inline-flex shrink-0 items-center gap-1.5 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors dark:border-slate-700 dark:text-slate-300'
+
+function PrintRunsSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          key={index}
+          className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60"
+        >
+          <div className="flex flex-wrap items-center gap-3 p-4">
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="ml-auto h-7 w-20 rounded-md" />
+          </div>
+          <div className="divide-y divide-slate-200 border-t border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+            {Array.from({ length: 2 }).map((_, itemIndex) => (
+              <div key={itemIndex} className="flex flex-wrap items-center gap-3 px-4 py-3">
+                <Skeleton className="size-11 shrink-0" />
+                <div className="w-44 shrink-0 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-6 flex-1" />
+                <Skeleton className="h-4 w-14 shrink-0" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 function PrintRuns({ searchQuery }: PrintRunsProps) {
   const { data: printRuns, loading, error, refetch, mutate } = usePrintRuns()
@@ -182,7 +215,12 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading print runs..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading print runs..."
+          skeleton={<PrintRunsSkeleton />}
+        />
       )}
 
       {!loading && !error && (

@@ -8,12 +8,23 @@ import { usesDtf } from '../../lib/printType'
 import type { DtfPrintOrder } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
 import ConfirmDialog from '../ui/ConfirmDialog'
+import SkeletonRow from '../ui/SkeletonRow'
 import Toast from '../ui/Toast'
 import DtfPrintOrderFormModal from './DtfPrintOrderFormModal'
 import DtfStockFormModal from './DtfStockFormModal'
 
 interface DtfPrintsProps {
   searchQuery: string
+}
+
+function DtfPrintsSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <SkeletonRow key={index} trailing={['w-16', 'w-16', 'w-28']} />
+      ))}
+    </div>
+  )
 }
 
 function DtfPrints({ searchQuery }: DtfPrintsProps) {
@@ -197,7 +208,12 @@ function DtfPrints({ searchQuery }: DtfPrintsProps) {
         </div>
 
         {(loading || error) && (
-          <AsyncState loading={loading} error={error} loadingLabel="Loading DTF orders..." />
+          <AsyncState
+            loading={loading}
+            error={error}
+            loadingLabel="Loading DTF orders..."
+            skeleton={<DtfPrintsSkeleton />}
+          />
         )}
 
         {!loading && !error && (

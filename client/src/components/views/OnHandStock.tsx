@@ -5,6 +5,7 @@ import { cldThumb } from '../../lib/cloudinaryImage'
 import { sortSizes } from '../../lib/variantMatrix'
 import type { FinishedGood } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
+import Skeleton from '../ui/Skeleton'
 import Toast from '../ui/Toast'
 import AddStockModal from './AddStockModal'
 import SellStockModal from './SellStockModal'
@@ -69,6 +70,32 @@ function groupBySizes(items: FinishedGood[]): StockGroup[] {
   }
 
   return [...groups.values()].sort((a, b) => a.design.designName.localeCompare(b.design.designName))
+}
+
+function OnHandStockSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div
+          key={index}
+          className={`${rowGridClass} rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60`}
+        >
+          <Skeleton className="size-16 shrink-0" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {Array.from({ length: 3 }).map((_, sizeIndex) => (
+              <Skeleton key={sizeIndex} className="h-10 w-12 rounded-lg" />
+            ))}
+          </div>
+          <Skeleton className="ml-auto h-6 w-10" />
+          <Skeleton className="ml-auto h-7 w-16 rounded-md" />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 function OnHandStock({ searchQuery }: OnHandStockProps) {
@@ -143,7 +170,12 @@ function OnHandStock({ searchQuery }: OnHandStockProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading finished goods..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading finished goods..."
+          skeleton={<OnHandStockSkeleton />}
+        />
       )}
 
       {!loading && !error && (

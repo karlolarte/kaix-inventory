@@ -6,6 +6,7 @@ import { api } from '../../lib/api'
 import type { RawMaterial } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
 import ConfirmDialog from '../ui/ConfirmDialog'
+import SkeletonRow from '../ui/SkeletonRow'
 import Toast from '../ui/Toast'
 import EditRawMaterialModal from './EditRawMaterialModal'
 import RawMaterialProductCard from './RawMaterialProductCard'
@@ -18,6 +19,16 @@ interface RawMaterialsProps {
 
 function groupKey(item: RawMaterial) {
   return [item.name, item.brand ?? '', item.styleNumber ?? ''].join('::')
+}
+
+function RawMaterialsSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <SkeletonRow key={index} trailing={['w-20', 'w-14', 'w-14', 'w-14']} />
+      ))}
+    </div>
+  )
 }
 
 function RawMaterials({ searchQuery }: RawMaterialsProps) {
@@ -144,7 +155,12 @@ function RawMaterials({ searchQuery }: RawMaterialsProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading raw materials..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading raw materials..."
+          skeleton={<RawMaterialsSkeleton />}
+        />
       )}
 
       {!loading && !error && (

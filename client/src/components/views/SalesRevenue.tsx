@@ -5,6 +5,8 @@ import { useSales, type SalesRange } from '../../hooks/useSales'
 import { formatCurrency } from '../../lib/currency'
 import { buildRevenueSeries, topDesignsByRevenue } from '../../lib/salesAggregation'
 import AsyncState from '../ui/AsyncState'
+import Skeleton from '../ui/Skeleton'
+import SkeletonStatCard from '../ui/SkeletonStatCard'
 import StatCard from '../ui/StatCard'
 
 interface SalesRevenueProps {
@@ -17,6 +19,43 @@ const RANGE_OPTIONS: { value: SalesRange; label: string }[] = [
   { value: '90d', label: 'Last 90 days' },
   { value: 'all', label: 'All time' },
 ]
+
+function SalesRevenueSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <SkeletonStatCard key={index} />
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900/60">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="mt-4 h-48 w-full" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, panelIndex) => (
+          <div
+            key={panelIndex}
+            className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900/60"
+          >
+            <Skeleton className="h-4 w-36" />
+            <div className="mt-4 space-y-3">
+              {Array.from({ length: 5 }).map((_, rowIndex) => (
+                <div key={rowIndex} className="flex items-center gap-3">
+                  <Skeleton className="size-6 shrink-0 rounded-full" />
+                  <Skeleton className="h-3 flex-1" />
+                  <Skeleton className="h-3 w-14 shrink-0" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function SalesRevenue({ searchQuery }: SalesRevenueProps) {
   const [range, setRange] = useState<SalesRange>('30d')
@@ -73,7 +112,12 @@ function SalesRevenue({ searchQuery }: SalesRevenueProps) {
       </div>
 
       {(loading || error) && (
-        <AsyncState loading={loading} error={error} loadingLabel="Loading sales..." />
+        <AsyncState
+          loading={loading}
+          error={error}
+          loadingLabel="Loading sales..."
+          skeleton={<SalesRevenueSkeleton />}
+        />
       )}
 
       {!loading && !error && (

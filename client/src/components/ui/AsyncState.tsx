@@ -1,13 +1,17 @@
 import { Loader2, TriangleAlert } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface AsyncStateProps {
   loading: boolean;
   error: string | null;
   loadingLabel?: string;
+  /** Page-shaped placeholder to show instead of the spinner while loading. */
+  skeleton?: ReactNode;
 }
 
-function AsyncState({ loading, error, loadingLabel = "Loading..." }: AsyncStateProps) {
+function AsyncState({ loading, error, loadingLabel = "Loading...", skeleton }: AsyncStateProps) {
   if (loading) {
+    if (skeleton) return <>{skeleton}</>;
     return (
       <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500">
         <Loader2 className="size-4 animate-spin" />

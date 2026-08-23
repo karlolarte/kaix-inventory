@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useSales } from '../../hooks/useSales'
 import { formatCurrency } from '../../lib/currency'
 import { topDesignsByRevenue } from '../../lib/salesAggregation'
+import Skeleton from '../ui/Skeleton'
 
 interface RevenueSnapshotPanelProps {
   onViewAll: () => void
@@ -37,7 +38,23 @@ function RevenueSnapshotPanel({ onViewAll }: RevenueSnapshotPanelProps) {
         </button>
       </div>
 
-      {loading && <p className="py-6 text-center text-sm text-slate-500">Loading revenue...</p>}
+      {loading && (
+        <div className="mt-3 space-y-4">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-28" />
+            <Skeleton className="h-3 w-40" />
+          </div>
+          <div className="space-y-2.5">
+            {Array.from({ length: TOP_DESIGN_COUNT }).map((_, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <Skeleton className="size-5 shrink-0 rounded-full" />
+                <Skeleton className="h-3 flex-1" />
+                <Skeleton className="h-3 w-12 shrink-0" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {!loading && error && (
         <p className="py-6 text-center text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
