@@ -1,30 +1,34 @@
+'use client'
+
 import { LogOut, Menu, Search, Wifi, WifiOff } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import type { Theme } from '../../hooks/useTheme'
-import { type ViewKey, viewTitles } from '../../lib/navigation'
+import { useSearchContext } from '../../context/SearchContext'
+import { useThemeContext } from '../../context/ThemeContext'
+import { viewTitles, type ViewKey } from '../../lib/navigation'
 import ThemeToggle from '../ui/ThemeToggle'
 
 type ConnectionStatus = 'checking' | 'online' | 'offline'
 
 interface HeaderProps {
-  activeView: ViewKey
   onOpenMobileNav: () => void
-  searchValue: string
-  onSearchChange: (value: string) => void
-  theme: Theme
-  onToggleTheme: () => void
 }
 
-function Header({
-  activeView,
-  onOpenMobileNav,
-  searchValue,
-  onSearchChange,
-  theme,
-  onToggleTheme,
-}: HeaderProps) {
+// navigation.ts's hrefFor maps every ViewKey to `/${key}` except dashboard,
+// which is `/` — reversed here to look up the current page's title from its
+// pathname instead of the old `activeView` prop.
+function viewKeyForPathname(pathname: string): ViewKey {
+  if (pathname === '/') return 'dashboard'
+  const key = pathname.slice(1) as ViewKey
+  return key in viewTitles ? key : 'dashboard'
+}
+
+function Header({ onOpenMobileNav }: HeaderProps) {
   const { user, logout } = useAuth()
+  const { theme, toggleTheme } = useThemeContext()
+  const { searchQuery, setSearchQuery } = useSearchContext()
+  const pathname = usePathname()
   const [status, setStatus] = useState<ConnectionStatus>('checking')
   const [signingOut, setSigningOut] = useState(false)
 
@@ -74,15 +78,15 @@ function Header({
         </button>
 
         <h1 className="hidden shrink-0 text-base font-semibold text-slate-900 sm:block dark:text-white">
-          {viewTitles[activeView]}
+          {viewTitles[viewKeyForPathname(pathname)]}
         </h1>
 
         <div className="relative ml-0 flex-1 sm:ml-4 sm:max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="search"
-            value={searchValue}
-            onChange={(event) => onSearchChange(event.target.value)}
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search SKU or Screen ID..."
             className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
           />
@@ -106,7 +110,7 @@ function Header({
             {status === 'checking' ? 'Connecting...' : status === 'online' ? 'Live' : 'Offline'}
           </span>
 
-          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
 
           <div className="flex items-center gap-2 border-l border-slate-200 pl-3 sm:pl-4 dark:border-slate-800">
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700 ring-1 ring-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">

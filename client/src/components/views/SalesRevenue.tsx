@@ -1,3 +1,5 @@
+'use client'
+
 import { ImageOff, Receipt, ShoppingBag, TrendingUp, Wallet } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import RevenueBarChart from '../charts/RevenueBarChart'

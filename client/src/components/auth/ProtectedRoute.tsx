@@ -1,29 +1,35 @@
 import { Loader2 } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
+import { useEffect, type ReactNode } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import LoginPage from './LoginPage'
 
 interface ProtectedRouteProps {
   children: ReactNode
 }
 
-// This app has no client-side router (no URL-based views), so "redirect to
-// /login" becomes "render LoginPage in place of the app" — same practical
-// effect of blocking access until signed in, adapted to how App.tsx already
-// switches views via state rather than a route.
+// proxy.ts already redirects an unauthenticated request to /login before a
+// protected page even renders (the common case). This covers what proxy
+// can't see: the cookie expiring or getting invalidated *while* already on
+// a page — any API call's 401 response flips `user` to null via
+// AuthContext's global handler, and this pushes the router the rest of the
+// way, replacing the old "render LoginPage in place" fallback from before
+// this app had real routes.
 function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth()
+  const router = useRouter()
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [loading, user, router])
+
+  if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
         <Loader2 className="size-6 animate-spin text-slate-400" />
       </div>
     )
-  }
-
-  if (!user) {
-    return <LoginPage />
   }
 
   return <>{children}</>

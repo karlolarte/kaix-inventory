@@ -1,3 +1,5 @@
+'use client'
+
 import { Loader2, Plus, Trash2, X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useCategories } from '../../hooks/useInventory'

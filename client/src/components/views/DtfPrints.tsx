@@ -1,3 +1,5 @@
+'use client'
+
 import { CheckCircle2, Circle, ImageOff, Layers, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useDtfPrintOrders, useShirtDesigns } from '../../hooks/useInventory'

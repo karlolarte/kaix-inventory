@@ -1,3 +1,5 @@
+'use client'
+
 import { History, Loader2, TriangleAlert } from 'lucide-react'
 import { useActivityLogFeed } from '../../hooks/useActivityLog'
 import { activityActionLabels, activityActionStyles } from '../../lib/activityAction'

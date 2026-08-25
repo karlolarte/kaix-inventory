@@ -1,4 +1,7 @@
+'use client'
+
 import { Hash, KeyRound, Loader2, Lock, Mail } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
   useEffect,
   useRef,
@@ -104,8 +107,16 @@ function PinInput({ disabled, onComplete }: PinInputProps) {
 }
 
 function LoginPage() {
-  const { login, loginWithPin } = useAuth()
+  const { login, loginWithPin, user } = useAuth()
+  const router = useRouter()
   const [tab, setTab] = useState<LoginTab>('password')
+
+  // Covers both a signed-in user landing on /login directly, and a
+  // successful login/PIN submit just below (which sets `user`) — either way
+  // this is the one place that leaves the login route for the app.
+  useEffect(() => {
+    if (user) router.push('/')
+  }, [user, router])
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -151,7 +162,7 @@ function LoginPage() {
       <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-white p-2.5 ring-1 ring-inset ring-slate-200 dark:ring-slate-700">
-            <img src={logo} alt="Kaix Customs logo" className="size-full object-contain" />
+            <img src={logo.src} alt="Kaix Customs logo" className="size-full object-contain" />
           </span>
           <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
             Kaix Customs

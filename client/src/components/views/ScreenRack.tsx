@@ -1,3 +1,5 @@
+'use client'
+
 import { ChevronDown, ChevronLeft, ChevronRight, ImageOff, Pencil, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useScreens, useShirtDesigns } from '../../hooks/useInventory'

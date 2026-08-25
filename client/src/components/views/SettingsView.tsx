@@ -1,14 +1,12 @@
+'use client'
+
 import { LogOut, Moon, Sun } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import type { Theme } from '../../hooks/useTheme'
+import { useThemeContext } from '../../context/ThemeContext'
 
-interface SettingsViewProps {
-  theme: Theme
-  onToggleTheme: () => void
-}
-
-function SettingsView({ theme, onToggleTheme }: SettingsViewProps) {
+function SettingsView() {
+  const { theme, toggleTheme } = useThemeContext()
   const isDark = theme === 'dark'
   const { user, logout } = useAuth()
   const [signingOut, setSigningOut] = useState(false)
@@ -44,7 +42,7 @@ function SettingsView({ theme, onToggleTheme }: SettingsViewProps) {
           <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-950">
             <button
               type="button"
-              onClick={() => isDark && onToggleTheme()}
+              onClick={() => isDark && toggleTheme()}
               aria-pressed={!isDark}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
                 !isDark
@@ -57,7 +55,7 @@ function SettingsView({ theme, onToggleTheme }: SettingsViewProps) {
             </button>
             <button
               type="button"
-              onClick={() => !isDark && onToggleTheme()}
+              onClick={() => !isDark && toggleTheme()}
               aria-pressed={isDark}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
                 isDark

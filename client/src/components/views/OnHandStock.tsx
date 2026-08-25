@@ -1,3 +1,5 @@
+'use client'
+
 import { ImageOff, Plus, ShoppingCart } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useFinishedGoods } from '../../hooks/useInventory'

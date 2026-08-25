@@ -1,4 +1,7 @@
+'use client'
+
 import { Send, Shirt, TriangleAlert } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import {
   useDtfPrintOrders,
@@ -8,7 +11,7 @@ import {
 } from '../../hooks/useInventory'
 import { api } from '../../lib/api'
 import type { DtfPrintOrder, RawMaterial } from '../../types/api'
-import type { ViewKey } from '../../lib/navigation'
+import { hrefFor } from '../../lib/navigation'
 import AsyncState from '../ui/AsyncState'
 import Skeleton from '../ui/Skeleton'
 import SkeletonStatCard from '../ui/SkeletonStatCard'
@@ -20,10 +23,6 @@ import QuickActionsBar from './QuickActionsBar'
 import RecentActivityPanel from './RecentActivityPanel'
 import RevenueSnapshotPanel from './RevenueSnapshotPanel'
 import TopSellingDesigns from './TopSellingDesigns'
-
-interface DashboardHomeProps {
-  onNavigate: (view: ViewKey) => void
-}
 
 // A panel box's shared shape (icon + title + "View all" up top, a handful
 // of rows below) — reused for every card in the dashboard's panel grid.
@@ -74,7 +73,9 @@ function DashboardHomeSkeleton() {
   )
 }
 
-function DashboardHome({ onNavigate }: DashboardHomeProps) {
+function DashboardHome() {
+  const router = useRouter()
+  const onNavigate = (key: Parameters<typeof hrefFor>[0]) => router.push(hrefFor(key))
   const { data: rawMaterials, loading: materialsLoading, error: materialsError, refetch: refetchMaterials } = useRawMaterials()
   const { data: printRuns, loading: printRunsLoading, error: printRunsError } = usePrintRuns()
   const { data: finishedGoods, loading: finishedGoodsLoading, error: finishedGoodsError } = useFinishedGoods()

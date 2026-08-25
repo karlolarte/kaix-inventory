@@ -1,24 +1,21 @@
+'use client'
+
 import { ChevronsLeft, ChevronsRight, X } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import logo from '../../assets/kaix-butterfly.png'
-import { navItems, type ViewKey } from '../../lib/navigation'
+import { navItems } from '../../lib/navigation'
 
 interface SidebarProps {
-  activeView: ViewKey
-  onNavigate: (view: ViewKey) => void
   collapsed: boolean
   onToggleCollapsed: () => void
   mobileOpen: boolean
   onCloseMobile: () => void
 }
 
-function Sidebar({
-  activeView,
-  onNavigate,
-  collapsed,
-  onToggleCollapsed,
-  mobileOpen,
-  onCloseMobile,
-}: SidebarProps) {
+function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile }: SidebarProps) {
+  const pathname = usePathname()
+
   return (
     <>
       {mobileOpen && (
@@ -41,7 +38,7 @@ function Sidebar({
                 (not a filled shape), so it needs contrast that holds
                 regardless of the app's own light/dark theme. */}
             <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-slate-900 p-2.5 ring-1 ring-inset ring-slate-800">
-              <img src={logo} alt="Kaix Customs" className="size-full object-contain" />
+              <img src={logo.src} alt="Kaix Customs" className="size-full object-contain" />
             </span>
             <span className={`flex flex-col leading-tight ${collapsed ? 'lg:hidden' : ''}`}>
               <span className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
@@ -65,12 +62,12 @@ function Sidebar({
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
           {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = item.key === activeView
+            const isActive = item.href === pathname
             return (
-              <button
+              <Link
                 key={item.key}
-                type="button"
-                onClick={() => onNavigate(item.key)}
+                href={item.href}
+                onClick={onCloseMobile}
                 title={collapsed ? item.label : undefined}
                 className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
@@ -92,7 +89,7 @@ function Sidebar({
                     className={`ml-auto size-1.5 rounded-full bg-sky-500 dark:bg-sky-400 ${collapsed ? 'lg:hidden' : ''}`}
                   />
                 )}
-              </button>
+              </Link>
             )
           })}
         </nav>
