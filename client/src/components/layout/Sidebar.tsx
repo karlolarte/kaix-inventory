@@ -26,12 +26,13 @@ function Sidebar({
           type="button"
           aria-label="Close navigation"
           onClick={onCloseMobile}
-          className="fixed inset-0 z-30 bg-slate-950/40 backdrop-blur-sm lg:hidden dark:bg-slate-950/70"
+          className="animate-backdrop-in fixed inset-0 z-30 bg-slate-950/40 lg:hidden dark:bg-slate-950/70"
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex h-full flex-col border-r border-slate-200 bg-white pt-[env(safe-area-inset-top)] transition-all duration-200 ease-out lg:sticky lg:top-0 lg:z-0 lg:h-screen lg:translate-x-0 dark:border-slate-800 dark:bg-slate-950 ${
+        style={{ transitionTimingFunction: 'var(--ease-drawer)' }}
+        className={`fixed inset-y-0 left-0 z-40 flex h-full flex-col border-r border-slate-200 bg-white pt-[env(safe-area-inset-top)] transition-all duration-300 lg:sticky lg:top-0 lg:z-0 lg:h-screen lg:translate-x-0 lg:duration-200 dark:border-slate-800 dark:bg-slate-950 ${
           collapsed ? 'lg:w-[76px]' : 'lg:w-64'
         } ${mobileOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full lg:translate-x-0'}`}
       >
@@ -55,7 +56,7 @@ function Sidebar({
           <button
             type="button"
             onClick={onCloseMobile}
-            className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
             aria-label="Close navigation"
           >
             <X className="size-5" />

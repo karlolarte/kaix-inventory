@@ -229,7 +229,7 @@ function RawMaterials({ searchQuery }: RawMaterialsProps) {
         />
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

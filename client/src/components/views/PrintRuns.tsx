@@ -5,6 +5,8 @@ import { api } from '../../lib/api'
 import { cldThumb } from '../../lib/cloudinaryImage'
 import { onHandCoverage } from '../../lib/onHandCoverage'
 import { printRunStatusLabels, printRunStatusStyles } from '../../lib/printRunStatus'
+import { usesSilkscreen } from '../../lib/printType'
+import { formatScreenNumber } from '../../lib/screenNumber'
 import { sortSizes } from '../../lib/variantMatrix'
 import type { PrintRun, PrintRunItem } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
@@ -63,7 +65,11 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
   // Prints, and On-Hand Stock would keep showing pre-deduction numbers until
   // their own 2-minute staleTime lapses.
   const { refetch: refetchRawMaterials } = useRawMaterials()
-  const { refetch: refetchDesigns } = useShirtDesigns()
+  const { data: designs, error: designsError, refetch: refetchDesigns } = useShirtDesigns()
+  const colorwaysById = useMemo(
+    () => new Map((designs ?? []).flatMap((design) => design.colorways.map((colorway) => [colorway.id, colorway] as const))),
+    [designs],
+  )
   // Also read here (not just refetched) so planned runs can flag lines whose
   // exact variation is already sitting in On-Hand Stock — see onHandCoverage.
   const { data: finishedGoods, refetch: refetchFinishedGoods } = useFinishedGoods()
@@ -307,7 +313,28 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
                       const sizes = sortSizes(item.sizes.map((s) => s.size)).map(
                         (size) => item.sizes.find((s) => s.size === size)!,
                       )
-                      const itemTotal = item.sizes.reduce((sum, s) => sum + s.quantity, 0)
+                      const screens = item.colorwayId ? colorwaysById.get(item.colorwayId)?.screens ?? [] : []
+                      const screenNumbers = usesSilkscreen(item.design.printType) && (
+                        <div className="w-20 shrink-0 pl-2 text-xs text-slate-500 sm:w-32 sm:pl-3">
+                          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide">Screens</p>
+                          <div className="flex flex-wrap gap-1" title="Current screen assignments">
+                          {!designs ? (
+                            <span>{designsError ? 'Unavailable' : 'Loading...'}</span>
+                          ) : screens.length > 0 ? (
+                            screens.map((screen) => (
+                              <span
+                                key={screen.id}
+                                className="rounded-md bg-violet-100 px-2 py-1 text-sm font-bold text-violet-700 dark:bg-violet-500/15 dark:text-violet-300"
+                              >
+                                {formatScreenNumber(screen.screenNumber)}
+                              </span>
+                            ))
+                          ) : (
+                            <span>No screens assigned</span>
+                          )}
+                          </div>
+                        </div>
+                      )
                       // Only meaningful for a still-planned run — a finished
                       // run's on-hand deduction (if any) already happened at
                       // finish time, so re-checking current stock here would
@@ -339,7 +366,7 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
                               ? `Mark ${item.design.designName} not done`
                               : `Mark ${item.design.designName} done`
                           }
-                          className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                          className={`inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-2.5 py-1.5 text-xs font-semibold transition-colors sm:w-28 ${
                             item.done
                               ? 'border-emerald-400 bg-emerald-500 text-white hover:bg-emerald-600'
                               : 'border-slate-200 text-slate-600 hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
@@ -378,7 +405,7 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
                             </div>
 
                             <div
-                              className={`flex shrink-0 items-center gap-1 overflow-x-auto ${item.done ? 'opacity-60' : ''}`}
+                              className={`flex max-w-20 shrink-0 items-center gap-1 overflow-x-auto ${item.done ? 'opacity-60' : ''}`}
                             >
                               {sizes.map((entry) => {
                                 const covered = coverageBySize?.get(entry.size) ?? 0
@@ -401,6 +428,8 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
                                 )
                               })}
                             </div>
+
+                            {screenNumbers}
 
                             {markDoneButton}
                           </div>
@@ -466,9 +495,7 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
                               })}
                             </div>
 
-                            <span className="shrink-0 text-sm font-semibold tabular-nums text-slate-500 dark:text-slate-400">
-                              {itemTotal} pcs
-                            </span>
+                            {screenNumbers}
 
                             {markDoneButton}
                           </div>
@@ -523,7 +550,7 @@ function PrintRuns({ searchQuery }: PrintRunsProps) {
         />
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

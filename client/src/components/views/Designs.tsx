@@ -8,8 +8,10 @@ import {
   Pencil,
   Plus,
   Send,
+  Trash2,
   Upload,
 } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useShirtDesigns } from '../../hooks/useInventory'
 import { api } from '../../lib/api'
@@ -20,6 +22,7 @@ import { formatScreenNumber } from '../../lib/screenNumber'
 import { screenStatusLabels, screenStatusStyles } from '../../lib/screenStatus'
 import type { ShirtDesign } from '../../types/api'
 import AsyncState from '../ui/AsyncState'
+import ConfirmDialog from '../ui/ConfirmDialog'
 import SkeletonRow from '../ui/SkeletonRow'
 import Toast from '../ui/Toast'
 import BulkAddDesignsModal from './BulkAddDesignsModal'
@@ -117,6 +120,7 @@ function DesignsSkeleton() {
 }
 
 function Designs({ searchQuery }: DesignsProps) {
+  const queryClient = useQueryClient()
   const { data: designs, loading, error, refetch, mutate } = useShirtDesigns()
   const query = searchQuery.trim().toLowerCase()
 
@@ -125,6 +129,8 @@ function Designs({ searchQuery }: DesignsProps) {
   const [editingDesign, setEditingDesign] = useState<ShirtDesign | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [page, setPage] = useState(0)
+  const [pendingDeleteDesign, setPendingDeleteDesign] = useState<ShirtDesign | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const filtered = useMemo(() => {
     if (!designs) return []
@@ -153,6 +159,24 @@ function Designs({ searchQuery }: DesignsProps) {
     setEditingDesign(null)
     refetch()
     showToast(message)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDeleteDesign || deleting) return
+    setDeleting(true)
+    try {
+      await api.del(`/shirt-designs/${pendingDeleteDesign.id}`)
+      mutate((prev) => prev?.filter((design) => design.id !== pendingDeleteDesign.id) ?? null)
+      setPage(Math.min(clampedPage, Math.max(0, Math.ceil((filtered.length - 1) / DESIGNS_PAGE_SIZE) - 1)))
+      void queryClient.invalidateQueries({ queryKey: ['/screens'] })
+      showToast(`Deleted ${pendingDeleteDesign.designName}.`)
+      setPendingDeleteDesign(null)
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Could not delete the design. Please try again.')
+      setPendingDeleteDesign(null)
+    } finally {
+      setDeleting(false)
+    }
   }
 
   const setActive = (id: string, active: boolean) => {
@@ -223,6 +247,17 @@ function Designs({ searchQuery }: DesignsProps) {
               >
                 <Pencil className="size-3.5" />
                 <span className="hidden sm:inline">Edit</span>
+              </button>
+            )
+            const deleteButton = (
+              <button
+                type="button"
+                onClick={() => setPendingDeleteDesign(design)}
+                aria-label={`Delete ${design.designName}`}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:border-red-400 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-500/10"
+              >
+                <Trash2 className="size-3.5" />
+                <span className="hidden sm:inline">Delete</span>
               </button>
             )
             const toggleActiveButton = (
@@ -299,6 +334,7 @@ function Designs({ searchQuery }: DesignsProps) {
                     <div className="flex shrink-0 items-center gap-2">
                       {editButton}
                       {toggleActiveButton}
+                      {deleteButton}
                     </div>
                   </div>
                 </div>
@@ -352,6 +388,7 @@ function Designs({ searchQuery }: DesignsProps) {
                   <div className="ml-auto flex shrink-0 items-center gap-2">
                     {editButton}
                     {toggleActiveButton}
+                    {deleteButton}
                   </div>
                 </div>
               </div>
@@ -415,7 +452,19 @@ function Designs({ searchQuery }: DesignsProps) {
         />
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      {pendingDeleteDesign && (
+        <ConfirmDialog
+          title="Delete design?"
+          message={`This will permanently delete "${pendingDeleteDesign.designName}" and its colorways. This cannot be undone.`}
+          confirmLabel={deleting ? 'Deleting...' : 'Delete design'}
+          tone="danger"
+          confirming={deleting}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setPendingDeleteDesign(null)}
+        />
+      )}
+
+      <Toast message={toastMessage} />
     </div>
   )
 }

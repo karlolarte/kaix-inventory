@@ -15,9 +15,18 @@ function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
       onClick={onToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+      className="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
     >
-      {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      <Sun
+        className={`absolute size-4 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+          isDark ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
+        }`}
+      />
+      <Moon
+        className={`absolute size-4 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+          isDark ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'
+        }`}
+      />
     </button>
   )
 }

@@ -173,7 +173,7 @@ function DashboardHome({ onNavigate }: DashboardHomeProps) {
 
       {!loading && !error && (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard
               label="Low Stock Alerts"
               value={lowStock.length}
@@ -230,7 +230,7 @@ function DashboardHome({ onNavigate }: DashboardHomeProps) {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+          <div className="stagger-children grid grid-cols-1 gap-5 xl:grid-cols-2 2xl:grid-cols-3">
             <LowStockPanel
               items={lowStock}
               pendingIds={pendingIds}
@@ -250,7 +250,7 @@ function DashboardHome({ onNavigate }: DashboardHomeProps) {
         </>
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

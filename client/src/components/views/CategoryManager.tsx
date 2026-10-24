@@ -208,7 +208,7 @@ function CategoryManager() {
         </div>
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

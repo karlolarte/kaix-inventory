@@ -331,7 +331,7 @@ function DtfPrints({ searchQuery }: DtfPrintsProps) {
         />
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

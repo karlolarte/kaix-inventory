@@ -290,9 +290,8 @@ shirtDesignsRouter.delete(
     // PrintRunItem.designId and FinishedGood.designId are both protected
     // references (production and stock history — see the Unlist comment on
     // the schema), so this would otherwise fail deep in a raw FK-constraint
-    // error. Check first for a clear message; the Designs page itself no
-    // longer offers hard delete for exactly this reason, but the API stays
-    // available for designs that truly have neither.
+    // error. Check first so the Designs page can show a clear message and
+    // suggest unlisting when a design has production or stock history.
     const [printRunItemCount, finishedGoodCount] = await Promise.all([
       prisma.printRunItem.count({ where: { designId: id } }),
       prisma.finishedGood.count({ where: { designId: id } }),
@@ -320,6 +319,7 @@ shirtDesignsRouter.delete(
     }, TRANSACTION_OPTIONS);
 
     invalidateCacheKey(SHIRT_DESIGNS_LIST_CACHE_KEY);
+    invalidateCacheKey("screens:list");
     logActivity({
       action: "DELETE",
       entityType: "ShirtDesign",

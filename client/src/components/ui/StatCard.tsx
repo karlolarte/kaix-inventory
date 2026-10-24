@@ -39,7 +39,7 @@ function StatCard({ label, value, icon: Icon, tone, hint, highlight }: StatCardP
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-slate-200 bg-white p-5 ring-1 ring-inset dark:border-slate-800 dark:bg-slate-900/60 ${classes.ring} ${
+      className={`group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-5 ring-1 ring-inset transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:shadow-black/20 ${classes.ring} ${
         highlight ? 'ring-2' : ''
       }`}
     >
@@ -48,7 +48,9 @@ function StatCard({ label, value, icon: Icon, tone, hint, highlight }: StatCardP
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
           <p className={`mt-2 text-3xl font-bold tabular-nums ${classes.value}`}>{value}</p>
         </div>
-        <span className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${classes.icon}`}>
+        <span
+          className={`flex size-10 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 ease-out group-hover:scale-110 ${classes.icon}`}
+        >
           <Icon className="size-5" strokeWidth={2} />
         </span>
       </div>

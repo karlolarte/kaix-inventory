@@ -5,4 +5,5 @@ dist/
 .DS_Store
 server/src/generated/
 server/uploads/*
+.next/
 !server/uploads/.gitkeep

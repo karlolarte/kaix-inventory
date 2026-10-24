@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 // AIChatDrawer temporarily disabled — not being used for now. Re-enable by
 // restoring this import and the <AIChatDrawer /> line below.
@@ -18,16 +18,31 @@ import ScreenRack from './components/views/ScreenRack'
 import SettingsView from './components/views/SettingsView'
 import { AuthProvider } from './context/AuthContext'
 import { useTheme } from './hooks/useTheme'
-import type { ViewKey } from './lib/navigation'
+import { navItems, type ViewKey } from './lib/navigation'
+
+function getViewFromUrl(): ViewKey {
+  const key = window.location.hash.slice(1)
+  return navItems.find((item) => item.key === key)?.key ?? 'dashboard'
+}
 
 function AppShell() {
-  const [activeView, setActiveView] = useState<ViewKey>('dashboard')
+  const [activeView, setActiveView] = useState<ViewKey>(getViewFromUrl)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const { theme, toggleTheme } = useTheme()
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveView(getViewFromUrl())
+      setMobileNavOpen(false)
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
   const handleNavigate = (view: ViewKey) => {
+    window.location.hash = view
     setActiveView(view)
     setMobileNavOpen(false)
   }

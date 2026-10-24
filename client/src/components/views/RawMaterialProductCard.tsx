@@ -121,7 +121,7 @@ function RawMaterialProductCard({ items, onEdit, onRestock, onUse, onDeleteReque
   )
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60">
+    <div className="rounded-xl border border-slate-200 bg-white transition-shadow duration-200 ease-out hover:shadow-md hover:shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:shadow-black/20">
       {/* Mobile: image + name on the left, quantity/variant pills stacked
           above the (icon-only) action buttons on the right. */}
       <div className="flex items-center justify-between gap-3 p-3 sm:hidden">

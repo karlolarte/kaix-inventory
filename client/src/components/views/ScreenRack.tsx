@@ -19,6 +19,7 @@ interface ScreenRackProps {
 // Keeps the "Needs Screens" panel from turning into an unbounded wall of
 // rows once a shop has a lot of designs waiting on screens.
 const NEEDS_SCREENS_PAGE_SIZE = 5
+const SCREENS_PAGE_SIZE = 10
 
 interface ScreenColorwayListProps {
   screen: PhysicalScreen
@@ -110,6 +111,7 @@ function ScreenRack({ searchQuery }: ScreenRackProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [needsScreensOpen, setNeedsScreensOpen] = useState(false)
   const [needsScreensPage, setNeedsScreensPage] = useState(0)
+  const [screenPagination, setScreenPagination] = useState({ query, page: 0 })
 
   const showToast = (message: string) => {
     setToastMessage(message)
@@ -240,6 +242,18 @@ function ScreenRack({ searchQuery }: ScreenRackProps) {
     )
   }, [screens, query])
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / SCREENS_PAGE_SIZE))
+  const page = screenPagination.query === query
+    ? Math.min(screenPagination.page, totalPages - 1)
+    : 0
+
+  // Search starts at page one; a shrinking list settles on its last valid page.
+  if (screenPagination.query !== query || screenPagination.page !== page) {
+    setScreenPagination({ query, page })
+  }
+
+  const pagedScreens = filtered.slice(page * SCREENS_PAGE_SIZE, (page + 1) * SCREENS_PAGE_SIZE)
+
   return (
     <div className="space-y-4">
       <div className="flex items-end justify-between gap-3">
@@ -359,7 +373,7 @@ function ScreenRack({ searchQuery }: ScreenRackProps) {
 
       {!loading && !error && (
         <div className="space-y-3">
-          {filtered.map((screen) => {
+          {pagedScreens.map((screen) => {
             const editButton = (
               <button
                 type="button"
@@ -531,6 +545,31 @@ function ScreenRack({ searchQuery }: ScreenRackProps) {
               {searchQuery ? `No screens match "${searchQuery}".` : 'No screens yet.'}
             </p>
           )}
+          {totalPages > 1 && (
+            <nav aria-label="Screen rack pagination" className="flex items-center justify-between gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setScreenPagination({ query, page: Math.max(0, page - 1) })}
+                disabled={page === 0}
+                className="flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                <ChevronLeft className="size-3.5" />
+                Prev
+              </button>
+              <span aria-live="polite" className="text-center text-xs text-slate-500">
+                Page {page + 1} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setScreenPagination({ query, page: Math.min(totalPages - 1, page + 1) })}
+                disabled={page === totalPages - 1}
+                className="flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Next
+                <ChevronRight className="size-3.5" />
+              </button>
+            </nav>
+          )}
         </div>
       )}
 
@@ -555,7 +594,7 @@ function ScreenRack({ searchQuery }: ScreenRackProps) {
         />
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

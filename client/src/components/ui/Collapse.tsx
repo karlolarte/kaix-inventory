@@ -17,11 +17,15 @@ export const COLLAPSE_DURATION_MS = 300
 function Collapse({ open, children, className = '' }: CollapseProps) {
   return (
     <div
-      className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
-        open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-      } ${className}`}
+      inert={!open}
+      aria-hidden={!open}
+      style={{
+        gridTemplateRows: open ? 'minmax(0, 1fr)' : 'minmax(0, 0fr)',
+        transitionTimingFunction: 'var(--ease-in-out-strong)',
+      }}
+      className={`grid overflow-hidden transition-[grid-template-rows] duration-300 ${className}`}
     >
-      <div className="overflow-hidden">{children}</div>
+      <div className="min-h-0 overflow-hidden">{children}</div>
     </div>
   )
 }

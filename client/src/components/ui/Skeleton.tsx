@@ -7,7 +7,11 @@ interface SkeletonProps {
 // with each view) so a page's loading state roughly matches its real
 // content's shape instead of just pausing on a spinner.
 function Skeleton({ className = '' }: SkeletonProps) {
-  return <div className={`animate-pulse rounded-md bg-slate-200 dark:bg-slate-800 ${className}`} />
+  return (
+    <div className={`relative overflow-hidden rounded-md bg-slate-200 dark:bg-slate-800 ${className}`}>
+      <div className="animate-shimmer absolute inset-0" />
+    </div>
+  )
 }
 
 export default Skeleton

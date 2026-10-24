@@ -284,7 +284,7 @@ function OnHandStock({ searchQuery }: OnHandStockProps) {
         />
       )}
 
-      {toastMessage && <Toast message={toastMessage} />}
+      <Toast message={toastMessage} />
     </div>
   )
 }

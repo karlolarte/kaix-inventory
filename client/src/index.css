@@ -2,17 +2,172 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@keyframes toast-in {
+:root {
+  /* Strong, intentional easing curves — the built-in CSS easings read as
+     weak/mushy at UI speeds. Source: easing.dev, tuned for snappy UI. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Every pressable element gets instant, tactile feedback on press — the
+   single highest-leverage "feels alive" change. Gated to fine pointers so
+   touch devices (which fire :active on tap-and-hold) don't get a stuck
+   pressed state. */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):active,
+  [role='button']:not([aria-disabled='true']):active {
+    transform: scale(0.97);
+  }
+}
+
+button:not(:disabled),
+[role='button'] {
+  transition: transform 120ms var(--ease-out-strong);
+}
+
+/* Materialize: backdrop blur + opacity together so overlays read as a real
+   layer of glass arriving, not a flat fade. */
+@keyframes backdrop-materialize {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    backdrop-filter: blur(8px);
+  }
+}
+
+.animate-backdrop-in {
+  animation: backdrop-materialize 220ms var(--ease-out-strong) forwards;
+}
+
+.animate-backdrop-out {
+  animation: backdrop-materialize 160ms var(--ease-in-out-strong) reverse forwards;
+}
+
+/* Dialogs (Modal, ConfirmDialog) are not anchored to a trigger, so per Apple
+   HIG they scale from center, not from scale(0) — nothing in the real world
+   appears from nothing. */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dialog-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(2px);
+  }
+}
+
+.animate-dialog-in {
+  animation: dialog-in 220ms var(--ease-out-strong) forwards;
+}
+
+.animate-dialog-out {
+  animation: dialog-out 160ms var(--ease-in-out-strong) forwards;
+}
+
+/* Toasts enter and exit along the same path (bottom edge) for spatial
+   consistency — where it came from is where it goes back to. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
   }
 }
 
 .animate-toast-in {
-  animation: toast-in 0.18s ease-out;
+  animation: toast-in 260ms var(--ease-out-strong) forwards;
+}
+
+.animate-toast-out {
+  animation: toast-out 180ms var(--ease-in-out-strong) forwards;
+}
+
+/* Shimmer sweep reads more premium than a flat opacity pulse. */
+@keyframes shimmer-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+.animate-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.6s ease-in-out infinite;
+}
+
+.dark .animate-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 80%
+  );
+}
+
+/* Cascading entrance for a grid/list of siblings — apply `.stagger-children`
+   to the container. Kept short (40ms steps) so it never reads as slow. */
+.stagger-children > * {
+  animation: dialog-in 320ms var(--ease-out-strong) both;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 40ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 80ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 160ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(n+7) { animation-delay: 240ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  button:not(:disabled):active,
+  [role='button']:not([aria-disabled='true']):active {
+    transform: none;
+  }
 }

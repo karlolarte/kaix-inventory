@@ -67,7 +67,7 @@ function Header({
         <button
           type="button"
           onClick={onOpenMobileNav}
-          className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+          className="rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
           aria-label="Open navigation"
         >
           <Menu className="size-5" />
@@ -78,19 +78,19 @@ function Header({
         </h1>
 
         <div className="relative ml-0 flex-1 sm:ml-4 sm:max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 transition-colors dark:text-slate-500" />
           <input
             type="search"
             value={searchValue}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search SKU or Screen ID..."
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
+            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-150 ease-out focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
           />
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
           <span
-            className={`hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium sm:flex ${
+            className={`hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-300 sm:flex ${
               status === 'online'
                 ? 'bg-emerald-100 text-emerald-700 ring-1 ring-inset ring-emerald-300 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30'
                 : status === 'offline'
@@ -101,7 +101,7 @@ function Header({
             {status === 'offline' ? (
               <WifiOff className="size-3.5" />
             ) : (
-              <Wifi className="size-3.5" />
+              <Wifi className={`size-3.5 ${status === 'online' ? 'animate-pulse' : ''}`} />
             )}
             {status === 'checking' ? 'Connecting...' : status === 'online' ? 'Live' : 'Offline'}
           </span>
@@ -124,7 +124,7 @@ function Header({
               disabled={signingOut}
               aria-label="Sign out"
               title="Sign out"
-              className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600 disabled:cursor-wait dark:hover:bg-slate-800 dark:hover:text-red-400"
+              className="rounded-md p-1.5 text-slate-400 transition-colors duration-150 hover:bg-slate-100 hover:text-red-600 disabled:cursor-wait dark:hover:bg-slate-800 dark:hover:text-red-400"
             >
               <LogOut className="size-4" />
             </button>
